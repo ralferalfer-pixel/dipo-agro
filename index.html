@@ -392,17 +392,33 @@ window.salvarServico = async function() {
 };
 
 // ABASTECIMENTO
+window.onTipoAbastChange = function() {
+  const tipo = document.getElementById('ab-tipo').value;
+  const kmWrap = document.getElementById('ab-km-wrap');
+  kmWrap.style.display = tipo === 'arla' ? 'none' : 'block';
+};
+
+window.calcTotalAbast = function() {
+  const valor = parseFloat(document.getElementById('ab-valor').value) || 0;
+  const litros = parseFloat(document.getElementById('ab-litros2').value) || 0;
+  const total = valor * litros;
+  document.getElementById('ab-total').textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+};
+
 window.salvarAbast = async function() {
   const veiculo = document.getElementById('ab-veiculo').value;
-  const litros = document.getElementById('ab-litros').value;
+  const litros = document.getElementById('ab-litros2').value;
+  const tipo = document.getElementById('ab-tipo').value;
   if (!veiculo || !litros) { alert('Preencha veículo e litros.'); return; }
 
   const dados = {
     tipo: 'abastecimento',
+    tipoCombustivel: tipo,
     veiculo,
     litros: parseFloat(litros),
     valorLitro: parseFloat(document.getElementById('ab-valor').value) || 0,
-    kmHorimetro: document.getElementById('ab-km').value || '',
+    totalReais: (parseFloat(litros) * (parseFloat(document.getElementById('ab-valor').value) || 0)),
+    kmHorimetro: tipo === 'diesel' ? (document.getElementById('ab-km').value || '') : '',
     posto: document.getElementById('ab-posto').value.trim(),
     operador: currentUser?.email || '',
     dataHora: new Date().toISOString(),
@@ -422,10 +438,11 @@ window.salvarAbast = async function() {
     }
     document.getElementById('success-abast').style.display = 'block';
     setTimeout(() => { document.getElementById('success-abast').style.display = 'none'; }, 2500);
-    document.getElementById('ab-litros').value = '';
+    document.getElementById('ab-litros2').value = '';
     document.getElementById('ab-valor').value = '';
     document.getElementById('ab-km').value = '';
     document.getElementById('ab-posto').value = '';
+    document.getElementById('ab-total').textContent = 'R$ 0,00';
   } catch(e) {
     alert('Salvo localmente. Será enviado quando tiver sinal.');
   }
@@ -606,6 +623,13 @@ async function syncPending() {
       <div class="card">
         <div class="sec-label">⛽ Abastecimento</div>
         <div class="field">
+          <label>Tipo de combustível</label>
+          <select id="ab-tipo" onchange="onTipoAbastChange()" style="font-size:16px;font-weight:600;">
+            <option value="diesel">⛽ Diesel</option>
+            <option value="arla">🔵 ARLA 32</option>
+          </select>
+        </div>
+        <div class="field">
           <label>Veículo ou máquina</label>
           <select id="ab-veiculo" style="font-size:15px;">
             <option value="">— Selecione —</option>
@@ -636,14 +660,15 @@ async function syncPending() {
             </optgroup>
           </select>
         </div>
-        <div class="field">
-          <label>Litros abastecidos</label>
-          <input type="number" id="ab-litros" placeholder="0,0" style="font-size:28px;text-align:center;font-weight:600;">
-        </div>
         <div class="row2">
-          <div class="field"><label>Valor por litro (R$)</label><input type="number" id="ab-valor" placeholder="6,00" style="text-align:center;"></div>
-          <div class="field"><label>KM / horímetro atual</label><input type="number" id="ab-km" placeholder="00000" style="text-align:center;"></div>
+          <div class="field"><label>Valor por litro (R$)</label><input type="number" id="ab-valor" placeholder="6,00" style="text-align:center;" oninput="calcTotalAbast()"></div>
+          <div class="field"><label>Litros</label><input type="number" id="ab-litros2" placeholder="0" style="text-align:center;font-size:20px;" oninput="calcTotalAbast()"></div>
         </div>
+        <div class="field" style="background:#f0f7ed;border-radius:10px;padding:12px;text-align:center;margin-bottom:4px;">
+          <label style="font-size:12px;">Total R$</label>
+          <div id="ab-total" style="font-size:24px;font-weight:700;color:#2D5A27;">R$ 0,00</div>
+        </div>
+        <div id="ab-km-wrap" class="field"><label>KM / horímetro atual</label><input type="number" id="ab-km" placeholder="00000" style="text-align:center;"></div>
         <div class="field" style="margin-bottom:0;"><label>Posto</label><input type="text" id="ab-posto" placeholder="Nome do posto..."></div>
       </div>
 
