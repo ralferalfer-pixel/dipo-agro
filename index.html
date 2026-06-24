@@ -158,7 +158,10 @@ const frota = {
     'METEOR28 — ROL6H66',
     'METEOR29 — ROL6H72',
     'VMX30 — JDM3F60',
-    'VMX31 — JDM3F63'
+    'VMX31 — JDM3F63',
+    'Van Sprinter — JCR1H89',
+    'Van Sprinter — DKE5272',
+    'Ônibus Itapororó — IOC3C14'
   ],
   maquinas: [
     'Motoniveladora 865B',
@@ -316,11 +319,11 @@ window.onVeiculoChange = function() {
   clientes.forEach(c => { const o = document.createElement('option'); o.textContent = c; selCli.appendChild(o); });
 
   // Campos
-  // caminhao: mostra KM + horas. maquina: mostra só horímetro
+  // caminhao: KM + horas. maquina: só horímetro + horas
   document.getElementById('bloco-km').style.display = tipoVeiculo === 'caminhao' ? 'block' : 'none';
   document.getElementById('bloco-horas').style.display = tipoVeiculo === 'caminhao' ? 'block' : 'none';
-  document.getElementById('bloco-horimetro').style.display = 'block';
-  document.getElementById('bloco-talhao').style.display = tipoVeiculo === 'maquina' ? 'block' : 'none';
+  document.getElementById('bloco-horimetro').style.display = tipoVeiculo === 'maquina' ? 'block' : 'none';
+  document.getElementById('bloco-talhao').style.display = 'none';
 
   document.getElementById('bloco-form').style.display = 'block';
   document.getElementById('success-servico').style.display = 'none';
@@ -619,6 +622,9 @@ async function syncPending() {
               <option>FH26 440 — NJQ6I81</option><option>METEOR27 — ROL6H75</option>
               <option>METEOR28 — ROL6H66</option><option>METEOR29 — ROL6H72</option>
               <option>VMX30 — JDM3F60</option><option>VMX31 — JDM3F63</option>
+              <option>Van Sprinter — JCR1H89</option>
+              <option>Van Sprinter — DKE5272</option>
+              <option>Ônibus Itapororó — IOC3C14</option>
             </optgroup>
             <optgroup label="Máquinas">
               <option>Motoniveladora 865B</option><option>Escavadeira Cat</option>
