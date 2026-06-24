@@ -316,12 +316,11 @@ window.onVeiculoChange = function() {
   clientes.forEach(c => { const o = document.createElement('option'); o.textContent = c; selCli.appendChild(o); });
 
   // Campos
-  document.getElementById('bloco-km').style.display = (tipoVeiculo === 'caminhao_km' || tipoVeiculo === 'caminhao_kmh' || tipoVeiculo === 'guindaste') ? 'block' : 'none';
-  document.getElementById('bloco-horas').style.display = tipoVeiculo === 'caminhao_kmh' ? 'block' : 'none';
-  document.getElementById('bloco-horimetro').style.display = (tipoVeiculo === 'guindaste' || tipoVeiculo === 'trator' || tipoVeiculo === 'maquina') ? 'block' : 'none';
-  // trator: hide standalone horas block since horimetro block already has hora fields
-  if (tipoVeiculo === 'trator' || tipoVeiculo === 'maquina' || tipoVeiculo === 'guindaste') { document.getElementById('bloco-horas').style.display = 'none'; }
-  document.getElementById('bloco-talhao').style.display = tipoVeiculo === 'trator' ? 'block' : 'none';
+  // caminhao: mostra KM + horas. maquina: mostra só horímetro
+  document.getElementById('bloco-km').style.display = tipoVeiculo === 'caminhao' ? 'block' : 'none';
+  document.getElementById('bloco-horas').style.display = tipoVeiculo === 'caminhao' ? 'block' : 'none';
+  document.getElementById('bloco-horimetro').style.display = 'block';
+  document.getElementById('bloco-talhao').style.display = tipoVeiculo === 'maquina' ? 'block' : 'none';
 
   document.getElementById('bloco-form').style.display = 'block';
   document.getElementById('success-servico').style.display = 'none';
@@ -481,7 +480,7 @@ async function syncPending() {
     </div>
     <div class="field">
       <label>Usuário</label>
-      <input type="email" id="l-user" placeholder="seu.nome@dipoagro.com" autocomplete="username" style="font-size:16px;">
+      <input type="text" id="l-user" placeholder="Ex: cristiano" autocomplete="username" style="font-size:16px;">
     </div>
     <div class="field">
       <label>Senha</label>
