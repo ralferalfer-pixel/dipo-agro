@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dipo Agro">
+<meta name="theme-color" content="#2D5A27">
+<title>Dipo Agronegócios</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{--verde:#2D5A27;--verde-claro:#EAF2E8;--verde-medio:#3B7233;--verde-borda:#4A8A40;--verde-escuro:#1E3D1A;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0f0;min-height:100vh;}
+.app{max-width:480px;margin:0 auto;background:white;min-height:100vh;display:flex;flex-direction:column;}
+.header{background:var(--verde);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.header-logo{color:white;font-size:20px;font-weight:700;letter-spacing:0.06em;}
+.header-sub{color:rgba(255,255,255,0.75);font-size:11px;letter-spacing:0.04em;}
+.header-user{display:flex;align-items:center;gap:10px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:13px;}
+.content{flex:1;padding:16px;}
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* Login */
+.login-wrap{padding:24px 16px;}
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-logo-box{display:inline-flex;flex-direction:column;align-items:center;border:2.5px solid var(--verde);border-radius:14px;padding:14px 28px;margin-bottom:12px;}
+.login-logo-dipo{font-size:36px;font-weight:700;color:var(--verde);letter-spacing:0.08em;line-height:1;}
+.login-logo-sub{font-size:11px;color:var(--verde-medio);letter-spacing:0.05em;margin-top:2px;}
+.login-title{font-size:15px;color:#666;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:14px;color:#555;margin-bottom:8px;font-weight:500;}
+.field input,.field select,.field textarea{width:100%;padding:14px 16px;border:1.5px solid #ddd;border-radius:12px;font-size:16px;background:#fafafa;color:#222;appearance:none;-webkit-appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--verde);background:white;}
+.field textarea{height:88px;resize:none;line-height:1.5;}
+.btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:17px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-verde{background:var(--verde);color:white;}
+.btn-verde:active{background:var(--verde-escuro);}
+.btn-outline{background:white;color:var(--verde);border:1.5px solid var(--verde);}
+.btn-sm{padding:10px 16px;font-size:14px;font-weight:500;border-radius:10px;border:none;cursor:pointer;}
+.btn-danger{background:#fff0f0;color:#c0392b;border:1px solid #f0c0c0;}
+
+/* Cards */
+.card{background:white;border:1px solid #e8e8e8;border-radius:16px;padding:16px;margin-bottom:14px;}
+.card-verde{background:var(--verde-claro);border-color:var(--verde-borda);}
+.card-title{font-size:15px;font-weight:600;color:#222;margin-bottom:14px;}
+
+/* Tipo buttons */
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;}
+.tipo-btn{padding:20px 12px;border:1.5px solid #ddd;border-radius:14px;background:white;cursor:pointer;text-align:center;transition:all 0.15s;}
+.tipo-btn.sel{border-color:var(--verde);background:var(--verde-claro);}
+.tipo-btn-icon{font-size:32px;margin-bottom:8px;}
+.tipo-btn-label{font-size:14px;font-weight:600;color:#333;}
+
+/* Row 2 */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* Chip */
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--verde-claro);border:1px solid var(--verde-borda);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--verde-escuro);margin-bottom:14px;}
+
+/* Success */
+.success{background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:14px;padding:20px;text-align:center;display:none;margin-bottom:14px;}
+.success-icon{font-size:40px;margin-bottom:8px;}
+.success-text{font-size:16px;font-weight:600;color:#2e7d32;}
+
+/* Sync badge */
+.sync-badge{display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:8px 12px;font-size:13px;color:#856404;margin-bottom:12px;text-align:center;}
+
+/* Section label */
+.sec-label{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+
+/* List items */
+.list-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0;}
+.list-item:last-child{border-bottom:none;}
+.list-item-info{flex:1;}
+.list-item-name{font-size:14px;font-weight:600;color:#222;}
+.list-item-sub{font-size:12px;color:#888;margin-top:2px;}
+
+/* Pending list */
+.pending-item{background:#fffbf0;border:1px solid #ffe082;border-radius:10px;padding:12px;margin-bottom:8px;}
+.pending-item-title{font-size:13px;font-weight:600;color:#5d4037;}
+.pending-item-sub{font-size:12px;color:#8d6e63;margin-top:3px;}
+
+/* Bottom nav */
+.bottom-nav{display:flex;background:white;border-top:1px solid #e8e8e8;padding:8px 0 env(safe-area-inset-bottom);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;background:none;border:none;cursor:pointer;color:#999;font-size:11px;}
+.nav-btn.active{color:var(--verde);}
+.nav-icon{font-size:22px;}
+
+/* Spinner */
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Offline indicator */
+.offline-bar{background:#f44336;color:white;text-align:center;font-size:13px;padding:6px;display:none;}
+.offline-bar.show{display:block;}
+</style>
+</head>
+<body>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA7TSt2d-1_CYRm21MEogb4WWnobo9KpUo",
+  authDomain: "dipo-d404d.firebaseapp.com",
+  projectId: "dipo-d404d",
+  storageBucket: "dipo-d404d.firebasestorage.app",
+  messagingSenderId: "823659940871",
+  appId: "1:823659940871:web:5510f3ac01a554211eeea2"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Offline persistence
+enableIndexedDbPersistence(db).catch(err => console.log('Offline:', err));
+
+// Estado global
+let currentUser = null;
+let tipoVeiculo = '';
+let pendingQueue = JSON.parse(localStorage.getItem('dipo_pending') || '[]');
+
+// Dados cadastrais (virão do Firestore futuramente)
+const frota = {
+  caminhoes: [
+    'FH01 540 — IUP8H53',
+    'FH02 440 — DTE6915',
+    'FH03 440 — DTE6J29',
+    'VM04 260 MUNCK — DTE7F31',
+    'VM05 260 — DTE7533',
+    'VM06 260 — DTE6J27',
+    'VM07 260 — IQP6F44',
+    'VM08 260 — IQQ1F54',
+    'VM10 270 — IUJ9I60',
+    'VM11 270 — IUL2A93',
+    'VM12 270 — IUJ9I55',
+    'MB01 — JAJ7C01',
+    'MB14 1620 — DKE5A13',
+    'VW15 19-320 — ECT4H10',
+    'SCANIA16 112 — ICH9J64',
+    'MB17 1935 TOCO — BWT6E22',
+    'MB18 1935 TRUCKADO — IGJ8E99',
+    'VOLVO19 N12 — IIL2E56',
+    'VW20 3/4 — ITP6H78',
+    'FM21 370 — ECM4H05',
+    'FM22 370 — ECM4C72',
+    'SC23 — LZH9E80',
+    'FH24 440 — NJR2I81',
+    'FH25 440 — NJR2G81',
+    'FH26 440 — NJQ6I81',
+    'METEOR27 — ROL6H75',
+    'METEOR28 — ROL6H66',
+    'METEOR29 — ROL6H72',
+    'VMX30 — JDM3F60',
+    'VMX31 — JDM3F63'
+  ],
+  maquinas: [
+    'Motoniveladora 865B',
+    'Escavadeira Cat',
+    'Escavadeira JCB',
+    'Trator de Esteira Cat',
+    'Rolo Compactador'
+  ]
+};
+
+const clientes = [
+  'Granja Santa Zélia',
+  'Estancia Santa Zélia',
+  'Estancia Santa Zélia (São Jorge)',
+  'Granja Touro Passo',
+  'Estancia Touro Passo (Santa Fé)',
+  'Itapororo (Vila)',
+  'Itapororo (Perau)',
+  'Itapororo (São Francisco)',
+  'Casa Velha (Anjico)',
+  'Granja Mancha Verde',
+  'Granja Santa Virgem',
+  'Estancia Santa Virgem',
+  'Estancia Santa Clara',
+  'Estancia Mancha Verde',
+  'Outro (digitar)'
+];
+
+const talhoes = {
+  'Fazenda Levante': ['Talhão 1','Talhão 2','Talhão 3','Talhão do Fundo','Talhão Norte'],
+  'Fazenda Santa Maria': ['Talhão A','Talhão B','Talhão Sul','Talhão Novo'],
+  'Fazenda São João': ['Talhão 1','Talhão 2','Talhão da Mata'],
+};
+
+const servicos = {
+  caminhao: ['Transporte de grãos','Transporte de pessoas','Coleta e entrega','Frete avulso','Serviço por hora','Içamento de carga','Outro'],
+  maquina: ['Gradeando','Remplam','Entaipando','Aração','Reforma de estrada','Terraplanagem','Escavação','Compactação de solo','Nivelamento de área','Outro']
+};
+
+// Offline/online
+window.addEventListener('online', () => { document.getElementById('offline-bar').classList.remove('show'); syncPending(); });
+window.addEventListener('offline', () => { document.getElementById('offline-bar').classList.add('show'); });
+if (!navigator.onLine) document.getElementById('offline-bar').classList.add('show');
+
+// Auth state
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    showApp();
+  } else {
+    showLogin();
+  }
+});
+
+// LOGIN
+window.doLogin = async function() {
+  const user = document.getElementById('l-user').value.trim();
+  const pass = document.getElementById('l-pass').value.trim();
+  const btn = document.getElementById('btn-login');
+  if (!user || !pass) { alert('Digite usuário e senha.'); return; }
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, user + '@dipoagro.com', pass);
+  } catch(e) {
+    alert('Usuário ou senha incorretos.');
+    btn.innerHTML = 'Entrar';
+    btn.disabled = false;
+  }
+};
+
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'block';
+  document.getElementById('main-app').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  const initials = (currentUser.email || 'U').substring(0,2).toUpperCase();
+  document.getElementById('user-initials').textContent = initials;
+  showTab('servico');
+  updatePendingBadge();
+}
+
+window.doLogout = async function() {
+  await signOut(auth);
+};
+
+// TABS
+window.showTab = function(tab) {
+  document.querySelectorAll('.tab-screen').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).style.display = 'block';
+  document.getElementById('nav-' + tab).classList.add('active');
+  if (tab === 'servico') resetForm();
+  if (tab === 'pendentes') renderPendentes();
+};
+
+// FORM SERVIÇO
+window.resetForm = function() {
+  tipoVeiculo = '';
+  document.getElementById('sel-veiculo').value = '';
+  document.getElementById('bloco-form').style.display = 'none';
+  document.getElementById('chip-veiculo').style.display = 'none';
+  document.getElementById('bloco-km').style.display = 'none';
+  document.getElementById('bloco-horas').style.display = 'none';
+  document.getElementById('bloco-horimetro').style.display = 'none';
+  document.getElementById('bloco-talhao').style.display = 'none';
+  document.getElementById('success-servico').style.display = 'none';
+};
+
+// Preencher select de veículos
+(function buildVeiculoSelect() {
+  const sel = document.getElementById('sel-veiculo');
+  const grupos = [
+    { label: 'Caminhões e Guindastes', items: frota.caminhoes, tipo: 'caminhao' },
+    { label: 'Máquinas', items: frota.maquinas, tipo: 'maquina' },
+  ];
+  grupos.forEach(g => {
+    const og = document.createElement('optgroup');
+    og.label = g.label;
+    g.items.forEach(item => {
+      const o = document.createElement('option');
+      o.value = item;
+      o.dataset.tipo = g.tipo;
+      o.textContent = item;
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+})();
+
+window.onVeiculoChange = function() {
+  const sel = document.getElementById('sel-veiculo');
+  const opt = sel.options[sel.selectedIndex];
+  tipoVeiculo = opt.dataset.tipo || '';
+  if (!tipoVeiculo) { document.getElementById('bloco-form').style.display = 'none'; document.getElementById('chip-veiculo').style.display = 'none'; return; }
+
+  // Chip
+  const chip = document.getElementById('chip-veiculo');
+  chip.textContent = '✓ ' + opt.value;
+  chip.style.display = 'inline-flex';
+
+  // Serviços
+  const selServ = document.getElementById('sel-servico');
+  selServ.innerHTML = '<option value="">— Selecione o serviço —</option>';
+  (servicos[tipoVeiculo] || []).forEach(s => {
+    const o = document.createElement('option'); o.textContent = s; selServ.appendChild(o);
+  });
+
+  // Clientes
+  const selCli = document.getElementById('sel-cliente');
+  selCli.innerHTML = '<option value="">— Selecione o cliente —</option>';
+  clientes.forEach(c => { const o = document.createElement('option'); o.textContent = c; selCli.appendChild(o); });
+
+  // Campos
+  document.getElementById('bloco-km').style.display = (tipoVeiculo === 'caminhao_km' || tipoVeiculo === 'caminhao_kmh' || tipoVeiculo === 'guindaste') ? 'block' : 'none';
+  document.getElementById('bloco-horas').style.display = tipoVeiculo === 'caminhao_kmh' ? 'block' : 'none';
+  document.getElementById('bloco-horimetro').style.display = (tipoVeiculo === 'guindaste' || tipoVeiculo === 'trator' || tipoVeiculo === 'maquina') ? 'block' : 'none';
+  // trator: hide standalone horas block since horimetro block already has hora fields
+  if (tipoVeiculo === 'trator' || tipoVeiculo === 'maquina' || tipoVeiculo === 'guindaste') { document.getElementById('bloco-horas').style.display = 'none'; }
+  document.getElementById('bloco-talhao').style.display = tipoVeiculo === 'trator' ? 'block' : 'none';
+
+  document.getElementById('bloco-form').style.display = 'block';
+  document.getElementById('success-servico').style.display = 'none';
+};
+
+window.onClienteChange = function() {
+  const cli = document.getElementById('sel-cliente').value;
+  const selTalhao = document.getElementById('sel-talhao');
+  selTalhao.innerHTML = '<option value="">— Selecione o talhão —</option>';
+  if (talhoes[cli]) {
+    talhoes[cli].forEach(t => { const o = document.createElement('option'); o.textContent = t; selTalhao.appendChild(o); });
+  }
+};
+
+window.salvarServico = async function() {
+  const veiculo = document.getElementById('sel-veiculo').value;
+  const servico = document.getElementById('sel-servico').value;
+  const servicoLivre = document.getElementById('servico-livre').value.trim();
+  const cliente = document.getElementById('sel-cliente').value;
+  if (!veiculo || (!servico && !servicoLivre) || !cliente) { alert('Preencha veículo, serviço e cliente.'); return; }
+
+  const dados = {
+    veiculo, tipoVeiculo,
+    servico: servico || servicoLivre,
+    cliente,
+    talhao: document.getElementById('sel-talhao')?.value || '',
+    obs: document.getElementById('obs').value.trim(),
+    kmInicial: document.getElementById('km-ini')?.value || '',
+    kmFinal: document.getElementById('km-fin')?.value || '',
+    nCargas: document.getElementById('n-cargas')?.value || '',
+    horaIni: document.getElementById('hora-ini')?.value || '',
+    horaFim: document.getElementById('hora-fim')?.value || '',
+    horimetroIni: document.getElementById('hor-ini')?.value || '',
+    horimetroFim: document.getElementById('hor-fim')?.value || '',
+    operador: currentUser?.email || '',
+    dataHora: new Date().toISOString(),
+    sincronizado: false
+  };
+
+  const btn = document.getElementById('btn-salvar');
+  btn.innerHTML = '<span class="spinner"></span> Salvando...';
+  btn.disabled = true;
+
+  try {
+    if (navigator.onLine) {
+      await addDoc(collection(db, 'servicos'), { ...dados, dataHora: serverTimestamp(), sincronizado: true });
+    } else {
+      pendingQueue.push(dados);
+      localStorage.setItem('dipo_pending', JSON.stringify(pendingQueue));
+      updatePendingBadge();
+    }
+    document.getElementById('success-servico').style.display = 'block';
+    setTimeout(resetForm, 2500);
+  } catch(e) {
+    pendingQueue.push(dados);
+    localStorage.setItem('dipo_pending', JSON.stringify(pendingQueue));
+    updatePendingBadge();
+    document.getElementById('success-servico').style.display = 'block';
+    setTimeout(resetForm, 2500);
+  }
+  btn.innerHTML = '✓ Salvar registro';
+  btn.disabled = false;
+};
+
+// ABASTECIMENTO
+window.salvarAbast = async function() {
+  const veiculo = document.getElementById('ab-veiculo').value;
+  const litros = document.getElementById('ab-litros').value;
+  if (!veiculo || !litros) { alert('Preencha veículo e litros.'); return; }
+
+  const dados = {
+    tipo: 'abastecimento',
+    veiculo,
+    litros: parseFloat(litros),
+    valorLitro: parseFloat(document.getElementById('ab-valor').value) || 0,
+    kmHorimetro: document.getElementById('ab-km').value || '',
+    posto: document.getElementById('ab-posto').value.trim(),
+    operador: currentUser?.email || '',
+    dataHora: new Date().toISOString(),
+  };
+
+  const btn = document.getElementById('btn-salvar-ab');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  try {
+    if (navigator.onLine) {
+      await addDoc(collection(db, 'abastecimentos'), { ...dados, dataHora: serverTimestamp() });
+    } else {
+      pendingQueue.push(dados);
+      localStorage.setItem('dipo_pending', JSON.stringify(pendingQueue));
+      updatePendingBadge();
+    }
+    document.getElementById('success-abast').style.display = 'block';
+    setTimeout(() => { document.getElementById('success-abast').style.display = 'none'; }, 2500);
+    document.getElementById('ab-litros').value = '';
+    document.getElementById('ab-valor').value = '';
+    document.getElementById('ab-km').value = '';
+    document.getElementById('ab-posto').value = '';
+  } catch(e) {
+    alert('Salvo localmente. Será enviado quando tiver sinal.');
+  }
+  btn.innerHTML = '✓ Salvar abastecimento';
+  btn.disabled = false;
+};
+
+// PENDENTES
+function renderPendentes() {
+  const list = document.getElementById('pending-list');
+  const empty = document.getElementById('pending-empty');
+  list.innerHTML = '';
+  if (pendingQueue.length === 0) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  pendingQueue.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'pending-item';
+    div.innerHTML = `<div class="pending-item-title">📋 ${item.servico || 'Abastecimento'} — ${item.cliente || item.veiculo}</div><div class="pending-item-sub">${item.veiculo} • ${new Date(item.dataHora).toLocaleString('pt-BR')}</div>`;
+    list.appendChild(div);
+  });
+}
+
+function updatePendingBadge() {
+  const badge = document.getElementById('pending-count');
+  badge.textContent = pendingQueue.length > 0 ? pendingQueue.length : '';
+  badge.style.display = pendingQueue.length > 0 ? 'inline' : 'none';
+  const syncBar = document.getElementById('sync-bar');
+  syncBar.style.display = pendingQueue.length > 0 ? 'block' : 'none';
+}
+
+async function syncPending() {
+  if (pendingQueue.length === 0) return;
+  const toSync = [...pendingQueue];
+  pendingQueue = [];
+  localStorage.setItem('dipo_pending', '[]');
+  for (const item of toSync) {
+    try {
+      const col = item.tipo === 'abastecimento' ? 'abastecimentos' : 'servicos';
+      await addDoc(collection(db, col), item);
+    } catch(e) {
+      pendingQueue.push(item);
+    }
+  }
+  localStorage.setItem('dipo_pending', JSON.stringify(pendingQueue));
+  updatePendingBadge();
+}
+</script>
+
+<!-- LOGIN -->
+<div id="login-screen" style="display:none; max-width:480px; margin:0 auto; background:white; min-height:100vh;">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="login-logo-box">
+        <span class="login-logo-dipo">DIPO</span>
+        <span class="login-logo-sub">Agronegócios Ltda</span>
+      </div>
+      <p class="login-title">Entre com seu usuário e senha</p>
+    </div>
+    <div class="field">
+      <label>Usuário</label>
+      <input type="email" id="l-user" placeholder="seu.nome@dipoagro.com" autocomplete="username" style="font-size:16px;">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="l-pass" placeholder="••••••" autocomplete="current-password" style="font-size:16px;">
+    </div>
+    <button class="btn btn-verde" id="btn-login" onclick="doLogin()" style="margin-top:8px;">Entrar</button>
+    <p style="text-align:center;font-size:13px;color:#999;margin-top:16px;">Esqueceu a senha? Fale com o administrador.</p>
+  </div>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div id="main-app" style="display:none; flex-direction:column; max-width:480px; margin:0 auto; background:white; min-height:100vh;">
+  <div id="offline-bar" class="offline-bar">📵 Sem sinal — registros serão salvos e enviados depois</div>
+
+  <div class="header">
+    <div>
+      <div class="header-logo">DIPO</div>
+      <div class="header-sub">Agronegócios Ltda</div>
+    </div>
+    <div class="header-user">
+      <div class="avatar" id="user-initials">US</div>
+      <button onclick="doLogout()" style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">Sair</button>
+    </div>
+  </div>
+
+  <div id="sync-bar" class="sync-badge" style="display:none;margin:12px 16px 0;">
+    ⏳ Você tem registros aguardando envio. Serão sincronizados quando houver sinal.
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:16px 16px 80px;">
+
+    <!-- TAB SERVIÇO -->
+    <div id="tab-servico" class="tab-screen">
+      <div class="card">
+        <div class="sec-label">Veículo ou máquina</div>
+        <div class="field" style="margin-bottom:0;">
+          <select id="sel-veiculo" onchange="onVeiculoChange()" style="font-size:15px;">
+            <option value="">— Selecione o veículo ou máquina —</option>
+          </select>
+        </div>
+        <div id="chip-veiculo" class="chip" style="display:none;margin-top:12px;margin-bottom:0;"></div>
+      </div>
+
+      <div id="bloco-form" style="display:none;">
+        <div class="card">
+          <div class="sec-label">Serviço</div>
+          <div class="field">
+            <label>Tipo de serviço</label>
+            <select id="sel-servico" style="font-size:15px;"><option value="">— Selecione —</option></select>
+          </div>
+          <div class="field">
+            <label>Outro serviço (se não estiver na lista)</label>
+            <input type="text" id="servico-livre" placeholder="Descreva o serviço...">
+          </div>
+          <div class="field">
+            <label>Cliente / fazenda</label>
+            <select id="sel-cliente" onchange="onClienteChange()" style="font-size:15px;"><option value="">— Selecione —</option></select>
+          </div>
+          <div id="bloco-talhao" style="display:none;">
+            <div class="field">
+              <label>Talhão</label>
+              <select id="sel-talhao" style="font-size:15px;"><option value="">— Selecione o talhão —</option></select>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Observação (opcional)</label>
+            <input type="text" id="obs" placeholder="Algum detalhe extra...">
+          </div>
+        </div>
+
+        <div id="bloco-km" style="display:none;">
+          <div class="card">
+            <div class="sec-label">🛣 Quilometragem</div>
+            <div class="row2">
+              <div class="field"><label>KM inicial</label><input type="number" id="km-ini" placeholder="00000" style="font-size:20px;text-align:center;"></div>
+              <div class="field"><label>KM final</label><input type="number" id="km-fin" placeholder="00000" style="font-size:20px;text-align:center;"></div>
+            </div>
+            <div class="field" style="margin-bottom:0;"><label>Número de cargas</label><input type="number" id="n-cargas" placeholder="1" style="text-align:center;"></div>
+          </div>
+        </div>
+
+        <div id="bloco-horas" style="display:none;">
+          <div class="card">
+            <div class="sec-label">🕐 Horas trabalhadas</div>
+            <div class="row2">
+              <div class="field"><label>Hora inicial</label><input type="time" id="hora-ini"></div>
+              <div class="field"><label>Hora final</label><input type="time" id="hora-fim"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="bloco-horimetro" style="display:none;">
+          <div class="card">
+            <div class="sec-label">⏱ Horímetro</div>
+            <div class="row2">
+              <div class="field"><label>Horímetro inicial</label><input type="number" id="hor-ini" placeholder="0000.0" style="font-size:18px;text-align:center;"></div>
+              <div class="field"><label>Horímetro final</label><input type="number" id="hor-fim" placeholder="0000.0" style="font-size:18px;text-align:center;"></div>
+            </div>
+            <div class="row2" style="margin-top:4px;">
+              <div class="field"><label>Hora inicial</label><input type="time" id="hora-ini2"></div>
+              <div class="field"><label>Hora final</label><input type="time" id="hora-fim2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="success-servico" class="success">
+          <div class="success-icon">✅</div>
+          <div class="success-text">Registro salvo com sucesso!</div>
+        </div>
+
+        <button class="btn btn-verde" id="btn-salvar" onclick="salvarServico()">✓ Salvar registro</button>
+      </div>
+    </div>
+
+    <!-- TAB ABASTECIMENTO -->
+    <div id="tab-abast" class="tab-screen" style="display:none;">
+      <div class="card">
+        <div class="sec-label">⛽ Abastecimento</div>
+        <div class="field">
+          <label>Veículo ou máquina</label>
+          <select id="ab-veiculo" style="font-size:15px;">
+            <option value="">— Selecione —</option>
+            <optgroup label="Caminhões e Guindastes">
+              <option>FH01 540 — IUP8H53</option><option>FH02 440 — DTE6915</option>
+              <option>FH03 440 — DTE6J29</option><option>VM04 260 MUNCK — DTE7F31</option>
+              <option>VM05 260 — DTE7533</option><option>VM06 260 — DTE6J27</option>
+              <option>VM07 260 — IQP6F44</option><option>VM08 260 — IQQ1F54</option>
+              <option>VM10 270 — IUJ9I60</option><option>VM11 270 — IUL2A93</option>
+              <option>VM12 270 — IUJ9I55</option><option>MB01 — JAJ7C01</option>
+              <option>MB14 1620 — DKE5A13</option><option>VW15 19-320 — ECT4H10</option>
+              <option>SCANIA16 112 — ICH9J64</option><option>MB17 1935 TOCO — BWT6E22</option>
+              <option>MB18 1935 TRUCKADO — IGJ8E99</option><option>VOLVO19 N12 — IIL2E56</option>
+              <option>VW20 3/4 — ITP6H78</option><option>FM21 370 — ECM4H05</option>
+              <option>FM22 370 — ECM4C72</option><option>SC23 — LZH9E80</option>
+              <option>FH24 440 — NJR2I81</option><option>FH25 440 — NJR2G81</option>
+              <option>FH26 440 — NJQ6I81</option><option>METEOR27 — ROL6H75</option>
+              <option>METEOR28 — ROL6H66</option><option>METEOR29 — ROL6H72</option>
+              <option>VMX30 — JDM3F60</option><option>VMX31 — JDM3F63</option>
+            </optgroup>
+            <optgroup label="Máquinas">
+              <option>Motoniveladora 865B</option><option>Escavadeira Cat</option>
+              <option>Escavadeira JCB</option><option>Trator de Esteira Cat</option>
+              <option>Rolo Compactador</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field">
+          <label>Litros abastecidos</label>
+          <input type="number" id="ab-litros" placeholder="0,0" style="font-size:28px;text-align:center;font-weight:600;">
+        </div>
+        <div class="row2">
+          <div class="field"><label>Valor por litro (R$)</label><input type="number" id="ab-valor" placeholder="6,00" style="text-align:center;"></div>
+          <div class="field"><label>KM / horímetro atual</label><input type="number" id="ab-km" placeholder="00000" style="text-align:center;"></div>
+        </div>
+        <div class="field" style="margin-bottom:0;"><label>Posto</label><input type="text" id="ab-posto" placeholder="Nome do posto..."></div>
+      </div>
+
+      <div id="success-abast" class="success" style="display:none;">
+        <div class="success-icon">✅</div>
+        <div class="success-text">Abastecimento registrado!</div>
+      </div>
+
+      <button class="btn btn-verde" id="btn-salvar-ab" onclick="salvarAbast()">✓ Salvar abastecimento</button>
+    </div>
+
+    <!-- TAB PENDENTES -->
+    <div id="tab-pendentes" class="tab-screen" style="display:none;">
+      <div class="card">
+        <div class="card-title">📤 Registros aguardando envio</div>
+        <p style="font-size:13px;color:#888;margin-bottom:14px;">Estes registros estão salvos no seu celular e serão enviados automaticamente quando houver sinal.</p>
+        <div id="pending-list"></div>
+        <div id="pending-empty" style="text-align:center;padding:20px;color:#888;font-size:14px;">✅ Tudo sincronizado!</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;">
+    <button class="nav-btn active" id="nav-servico" onclick="showTab('servico')">
+      <span class="nav-icon">📋</span>
+      <span>Serviço</span>
+    </button>
+    <button class="nav-btn" id="nav-abast" onclick="showTab('abast')">
+      <span class="nav-icon">⛽</span>
+      <span>Abastecimento</span>
+    </button>
+    <button class="nav-btn" id="nav-pendentes" onclick="showTab('pendentes')">
+      <span class="nav-icon">📤 <span id="pending-count" style="display:none;background:#e74c3c;color:white;border-radius:99px;font-size:10px;padding:1px 5px;"></span></span>
+      <span>Pendentes</span>
+    </button>
+  </div>
+</div>
+
+</body>
+</html>
