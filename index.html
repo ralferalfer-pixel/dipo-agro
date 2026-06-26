@@ -201,7 +201,7 @@ const talhoes = {
 };
 
 const servicos = {
-  caminhao: ['Transporte de grãos','Transporte de pessoas','Coleta e entrega','Frete avulso','Serviço por hora','Içamento de carga','Outro'],
+  caminhao: ['Transporte de grãos','Transporte de pessoas','Transporte de pecuária','Coleta e entrega','Frete avulso','Serviço por hora','Içamento de carga','Outro'],
   maquina: ['Gradeando','Remplam','Entaipando','Aração','Reforma de estrada','Terraplanagem','Escavação','Compactação de solo','Nivelamento de área','Outro']
 };
 
@@ -352,6 +352,7 @@ window.salvarServico = async function() {
   const dados = {
     veiculo, tipoVeiculo,
     servico: servico || servicoLivre,
+    origem: document.getElementById('sel-origem')?.value || document.getElementById('origem-livre')?.value || '',
     cliente,
     talhao: document.getElementById('sel-talhao')?.value || '',
     obs: document.getElementById('obs').value.trim(),
@@ -566,6 +567,31 @@ async function syncPending() {
           <div class="field">
             <label>Outro serviço (se não estiver na lista)</label>
             <input type="text" id="servico-livre" placeholder="Descreva o serviço...">
+          </div>
+          <div class="field">
+            <label>Local de início</label>
+            <select id="sel-origem" style="font-size:15px;">
+              <option value="">— Selecione o local de início —</option>
+              <option>Sede Dipo</option>
+              <option>Granja Santa Zélia</option>
+              <option>Estancia Santa Zélia</option>
+              <option>Estancia Santa Zélia (São Jorge)</option>
+              <option>Granja Touro Passo</option>
+              <option>Estancia Touro Passo (Santa Fé)</option>
+              <option>Itapororo (Vila)</option>
+              <option>Itapororo (Perau)</option>
+              <option>Itapororo (São Francisco)</option>
+              <option>Casa Velha (Anjico)</option>
+              <option>Granja Mancha Verde</option>
+              <option>Granja Santa Virgem</option>
+              <option>Estancia Santa Virgem</option>
+              <option>Estancia Santa Clara</option>
+              <option>Estancia Mancha Verde</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Outro local de início (se não estiver na lista)</label>
+            <input type="text" id="origem-livre" placeholder="Digite o local de início...">
           </div>
           <div class="field">
             <label>Cliente / fazenda</label>
