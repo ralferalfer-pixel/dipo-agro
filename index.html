@@ -263,6 +263,7 @@ window.showTab = function(tab) {
   document.getElementById('nav-' + tab).classList.add('active');
   if (tab === 'servico') resetForm();
   if (tab === 'pendentes') renderPendentes();
+  if (tab === 'historico') renderHistorico();
 };
 
 // FORM SERVIÇO
@@ -481,6 +482,50 @@ function updatePendingBadge() {
   badge.style.display = pendingQueue.length > 0 ? 'inline' : 'none';
   const syncBar = document.getElementById('sync-bar');
   syncBar.style.display = pendingQueue.length > 0 ? 'block' : 'none';
+}
+
+async function renderHistorico() {
+  const list = document.getElementById('historico-list');
+  const hoje = new Date();
+  const hojeStr = hoje.toLocaleDateString('pt-BR');
+
+  try {
+    const snap = await getDocs(collection(db, 'servicos'));
+    const meus = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      const op = d.operador || '';
+      if (op !== (currentUser?.email || '')) return;
+      const dt = d.dataHora?.toDate ? d.dataHora.toDate() : new Date(d.dataHora);
+      if (dt.toLocaleDateString('pt-BR') === hojeStr) {
+        meus.push({ id: doc.id, ...d, _data: dt });
+      }
+    });
+
+    if (meus.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:#888;font-size:14px;">Nenhum registro hoje ainda.</div>';
+      return;
+    }
+
+    meus.sort((a, b) => b._data - a._data);
+    list.innerHTML = meus.map(s => {
+      const ki = parseFloat(s.kmInicial)||0, kf = parseFloat(s.kmFinal)||0;
+      const hi = parseFloat(s.horimetroIni)||0, hf = parseFloat(s.horimetroFim)||0;
+      const km = kf > ki ? `🛣 ${(kf-ki).toLocaleString('pt-BR')} km` : '';
+      const h = hf > hi ? `⏱ ${(hf-hi).toFixed(1)} h` : '';
+      return `<div style="background:#f9f9f9;border:1px solid #eee;border-radius:12px;padding:12px;margin-bottom:10px;">
+        <div style="font-weight:700;font-size:14px;color:#222;margin-bottom:4px;">${s.veiculo || '—'}</div>
+        <div style="font-size:13px;color:#2D5A27;margin-bottom:4px;">${s.servico || '—'}</div>
+        <div style="font-size:12px;color:#666;margin-bottom:6px;">${s.cliente || '—'}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${km ? `<span style="background:#EAF2E8;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:600;color:#1E3D1A;">${km}</span>` : ''}
+          ${h ? `<span style="background:#EAF2E8;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:600;color:#1E3D1A;">${h}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Sem sinal. Tente novamente quando conectar.</div>';
+  }
 }
 
 async function syncPending() {
@@ -721,6 +766,15 @@ async function syncPending() {
       <button class="btn btn-verde" id="btn-salvar-ab" onclick="salvarAbast()">✓ Salvar abastecimento</button>
     </div>
 
+    <!-- TAB HISTÓRICO DO DIA -->
+    <div id="tab-historico" class="tab-screen" style="display:none;">
+      <div class="card">
+        <div class="card-title">✅ Meus registros de hoje</div>
+        <p style="font-size:13px;color:#888;margin-bottom:14px;">Confira o que você registrou hoje. Só aparecem os registros do dia atual.</p>
+        <div id="historico-list"><div style="text-align:center;padding:20px;color:#888;">Carregando...</div></div>
+      </div>
+    </div>
+
     <!-- TAB PENDENTES -->
     <div id="tab-pendentes" class="tab-screen" style="display:none;">
       <div class="card">
@@ -746,6 +800,10 @@ async function syncPending() {
     <button class="nav-btn" id="nav-pendentes" onclick="showTab('pendentes')">
       <span class="nav-icon">📤 <span id="pending-count" style="display:none;background:#e74c3c;color:white;border-radius:99px;font-size:10px;padding:1px 5px;"></span></span>
       <span>Pendentes</span>
+    </button>
+    <button class="nav-btn" id="nav-historico" onclick="showTab('historico')">
+      <span class="nav-icon">✅</span>
+      <span>Hoje</span>
     </button>
   </div>
 </div>
